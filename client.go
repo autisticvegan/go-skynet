@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 
 	"gitlab.com/NebulousLabs/errors"
 
@@ -91,7 +92,10 @@ func (sc *SkynetClient) executeRequest(config requestOptions, proxyURL string) (
 		resp, err = http.DefaultClient.Do(req)
 	} else {
 		proxyUrl, _ := url.Parse(proxyURL)
-		httpClient := &http.Client { Transport: &http.Transport { Proxy: http.ProxyURL(proxyUrl) } }
+		httpClient := &http.Client { 
+			Transport: &http.Transport { Proxy: http.ProxyURL(proxyUrl) },
+			Timeout: 30 * time.Second}
+	
 		resp, err = httpClient.Do(req)
 	}
 	// Execute the request.

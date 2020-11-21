@@ -7,6 +7,7 @@ import (
 	"net/url"
 
 	"gitlab.com/NebulousLabs/errors"
+
 )
 
 type (
@@ -45,8 +46,8 @@ func NewCustom(portalURL string, customOptions Options) SkynetClient {
 }
 
 // executeRequest makes and executes a request.
-func (sc *SkynetClient) executeRequest(config requestOptions) (*http.Response, error) {
-	url := sc.PortalURL
+func (sc *SkynetClient) executeRequest(config requestOptions, proxyURL string) (*http.Response, error) {
+	urlForRequest := sc.PortalURL
 	method := config.method
 	reqBody := config.reqBody
 
@@ -66,10 +67,11 @@ func (sc *SkynetClient) executeRequest(config requestOptions) (*http.Response, e
 	}
 
 	// Make the URL.
-	url = makeURL(url, opts.EndpointPath, config.extraPath, config.query)
+	urlForRequest = makeURL(urlForRequest, opts.EndpointPath, config.extraPath, config.query)
 
 	// Create the request.
-	req, err := http.NewRequest(method, url, reqBody)
+	req, err := http.NewRequest(method, urlForRequest, reqBody)
+	
 	if err != nil {
 		return nil, errors.AddContext(err, fmt.Sprintf("could not create %v request", method))
 	}
@@ -83,8 +85,18 @@ func (sc *SkynetClient) executeRequest(config requestOptions) (*http.Response, e
 		req.Header.Set("Content-Type", opts.customContentType)
 	}
 
+	// proxyUrl, err := url.Parse("http://87.236.233.92:8080")
+	var resp *http.Response
+	if proxyURL == "" {
+		resp, err = http.DefaultClient.Do(req)
+	} else {
+		proxyUrl, _ := url.Parse(proxyURL)
+		httpClient := &http.Client { Transport: &http.Transport { Proxy: http.ProxyURL(proxyUrl) } }
+		resp, err = httpClient.Do(req)
+	}
 	// Execute the request.
-	resp, err := http.DefaultClient.Do(req)
+	//resp, err := http.DefaultClient.Do(req)
+	
 	if err != nil {
 		return nil, errors.AddContext(err, "could not execute request")
 	}

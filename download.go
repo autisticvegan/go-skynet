@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"gitlab.com/NebulousLabs/errors"
+
 )
 
 type (
@@ -44,7 +45,7 @@ var (
 )
 
 // Download downloads generic data.
-func (sc *SkynetClient) Download(skylink string, opts DownloadOptions) (io.ReadCloser, error) {
+func (sc *SkynetClient) Download(skylink string, opts DownloadOptions, proxy string) (io.ReadCloser, error) {
 	skylink = strings.TrimPrefix(skylink, URISkynetPrefix)
 
 	values := url.Values{}
@@ -59,6 +60,7 @@ func (sc *SkynetClient) Download(skylink string, opts DownloadOptions) (io.ReadC
 			extraPath: skylink,
 			query:     values,
 		},
+		proxy,
 	)
 	if err != nil {
 		return nil, errors.AddContext(err, "could not execute request")
@@ -68,10 +70,10 @@ func (sc *SkynetClient) Download(skylink string, opts DownloadOptions) (io.ReadC
 }
 
 // DownloadFile downloads a file from Skynet to path.
-func (sc *SkynetClient) DownloadFile(path, skylink string, opts DownloadOptions) (err error) {
+func (sc *SkynetClient) DownloadFile(path, skylink string, opts DownloadOptions, proxy string) (err error) {
 	path = gopath.Clean(path)
 
-	downloadData, err := sc.Download(skylink, opts)
+	downloadData, err := sc.Download(skylink, opts, proxy)
 	if err != nil {
 		return errors.AddContext(err, "could not download data")
 	}

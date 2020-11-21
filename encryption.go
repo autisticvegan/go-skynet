@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"gitlab.com/NebulousLabs/errors"
+
 )
 
 type (
@@ -77,6 +78,7 @@ func (sc *SkynetClient) AddSkykey(skykey string, opts AddSkykeyOptions) error {
 			reqBody: body,
 			query:   values,
 		},
+		"",
 	)
 	if err != nil {
 		return errors.AddContext(err, "could not execute request")
@@ -100,6 +102,7 @@ func (sc *SkynetClient) CreateSkykey(name, skykeyType string, opts CreateSkykeyO
 			reqBody: body,
 			query:   values,
 		},
+		"",
 	)
 	if err != nil {
 		return Skykey{}, errors.AddContext(err, "could not execute request")
@@ -132,6 +135,7 @@ func (sc *SkynetClient) GetSkykeyByName(name string, opts GetSkykeyOptions) (Sky
 			reqBody: body,
 			query:   values,
 		},
+		"",
 	)
 	if err != nil {
 		return Skykey{}, errors.AddContext(err, "could not execute request")
@@ -164,6 +168,7 @@ func (sc *SkynetClient) GetSkykeyByID(id string, opts GetSkykeyOptions) (Skykey,
 			reqBody: body,
 			query:   values,
 		},
+		"",
 	)
 	if err != nil {
 		return Skykey{}, errors.AddContext(err, "could not execute request")
@@ -191,6 +196,7 @@ func (sc *SkynetClient) GetSkykeys(opts GetSkykeysOptions) ([]Skykey, error) {
 			method:  "GET",
 			reqBody: &bytes.Buffer{},
 		},
+		"",
 	)
 	if err != nil {
 		return nil, errors.AddContext(err, "could not execute request")
